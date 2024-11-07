@@ -6,7 +6,6 @@ from picamera2.encoders import H264Encoder
 from picamera2.outputs import FfmpegOutput
 import numpy as np
 import qwiic_vl53l1x
-from gpiozero import LED
 
 # Initialize the sensor
 my_sensor = qwiic_vl53l1x.QwiicVL53L1X()

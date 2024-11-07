@@ -68,7 +68,7 @@ def visualize_clusters(color, image, clusters):
     cv2.destroyAllWindows()
 
 
-def detect_frames(frames, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120, b_size=200, a_eps=1,
+def detect_frames(frames=[], r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120, b_size=200, a_eps=1,
                   a_samples=2):
     # Define RGB ranges for red and blue
     lower_red = np.array([158, 89, 90])
@@ -80,7 +80,7 @@ def detect_frames(frames, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=1
     metal_frame = []
     ferrous_frame = []
 
-    frame_count = frames.len()
+    frame_count = len(frames)
 
     for frame in frames:
         red_clusters = detect_clusters_in_frame(lower_red, upper_red, frame, eps=r_eps, min_samples=r_samples,
@@ -92,10 +92,10 @@ def detect_frames(frames, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=1
                 if frame_count >= 5 & frame_count <= 80:
                     metal_frame.append(frame_count)
 
-        # if red_clusters:
-        #     print(f"Red Clusters: {red_clusters}, frame: {frame_count}")
-        #     visualize_clusters('red', frame, red_clusters)
-        #
+        #if red_clusters:
+        #    print(f"Red Clusters: {red_clusters}, frame: {frame_count}")
+        #    visualize_clusters('red', frame, red_clusters)
+        
 
         blue_clusters = detect_clusters_in_frame(lower_blue, upper_blue, frame, eps=b_eps, min_samples=b_samples,
                                                  min_cluster_size=b_size)
@@ -107,9 +107,9 @@ def detect_frames(frames, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=1
                 if frame_count >= 5 & frame_count <= 80:
                     ferrous_frame.append(frame_count)
 
-        # if blue_clusters:
-        #     print(f"Blue Clusters: {blue_clusters}, frame: {frame_count}")
-        #     visualize_clusters('blue', frame, blue_clusters)
+        #if blue_clusters:
+        #    print(f"Blue Clusters: {blue_clusters}, frame: {frame_count}")
+        #    visualize_clusters('blue', frame, blue_clusters)
 
     metal_frame_array = np.array(metal_frame).reshape(-1, 1)
     ferrous_frame_array = np.array(ferrous_frame).reshape(-1, 1)
@@ -172,9 +172,9 @@ def detect(video_path, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120,
                 if frame_count >= 5 & frame_count <= 80:
                     metal_frame.append(frame_count)
 
-        # if red_clusters:
-        #     print(f"Red Clusters: {red_clusters}, frame: {frame_count}")
-        #     visualize_clusters('red', frame, red_clusters)
+        if red_clusters:
+            print(f"Red Clusters: {red_clusters}, frame: {frame_count}")
+            visualize_clusters('red', frame, red_clusters)
         #
 
         blue_clusters = detect_clusters_in_frame(lower_blue, upper_blue, frame, eps=b_eps, min_samples=b_samples,
@@ -187,9 +187,9 @@ def detect(video_path, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120,
                 if frame_count >= 5 & frame_count <= 80:
                     ferrous_frame.append(frame_count)
 
-        # if blue_clusters:
-        #     print(f"Blue Clusters: {blue_clusters}, frame: {frame_count}")
-        #     visualize_clusters('blue', frame, blue_clusters)
+        if blue_clusters:
+            print(f"Blue Clusters: {blue_clusters}, frame: {frame_count}")
+            visualize_clusters('blue', frame, blue_clusters)
 
     metal_frame_array = np.array(metal_frame).reshape(-1, 1)
     ferrous_frame_array = np.array(ferrous_frame).reshape(-1, 1)

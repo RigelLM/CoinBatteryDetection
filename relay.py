@@ -21,4 +21,3 @@ def set_relay(status):
 # if not os.path.exists("monitor_on"):
 #     with open("monitor_on", 'w') as file:
 #         pass
-

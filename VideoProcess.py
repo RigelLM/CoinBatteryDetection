@@ -28,7 +28,8 @@ def process_video(input_path, output_path):
     out.release()
 
 
-def get_frames(input_path, frames):
+def get_frames(input_path):
+    frames = []
     MW_pos = [350, 345]
     MW_size = [480, 285]
 
@@ -45,3 +46,4 @@ def get_frames(input_path, frames):
             frames.append(MW)
 
     cap.release()
+    return frames

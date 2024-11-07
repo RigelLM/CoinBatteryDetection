@@ -3,14 +3,13 @@ from gpiozero import LED
 import Scan
 import VideoProcess
 import ClusterDetection
-import LedControl
 import relay
 
 
 from gpiozero import Button
 from time import sleep
-import os
 import threading
+import os
 
 def main():
 
@@ -19,16 +18,17 @@ def main():
     Scan.scan("./Temp/v.mp4")
     sleep(2)
 
-    frames = VideoProcess.get_frames("./Temp/v.mp4")
+    #frames = []
+    #frames = VideoProcess.get_frames("./Temp/v.mp4")
+    #sleep(2)
+    #result = ClusterDetection.detect_frames(frames)
+
+    print("Preparing for detection ...")
+    VideoProcess.process_video("./Temp/v.mp4", "./Temp/v_p.mp4")
     sleep(2)
-    result = ClusterDetection.detect_frames(frames)
 
-    # print("Preparing for detection ...")
-    # VideoProcess.process_video("./Temp/v.mp4", "./Temp/v_p.mp4")
-    # sleep(2)
-
-    # print("Processing scanning result ...")
-    # result = ClusterDetection.detect("./Temp/v_p.mp4")
+    print("Processing scanning result ...")
+    result = ClusterDetection.detect("./Temp/v_p.mp4")
     return result
 
 def show(result):
@@ -48,7 +48,7 @@ def blink():
 
 if __name__ == "__main__":
     
-    # Decleration for gpio
+    # Declaration for gpio
     button= Button(26)
     led_green = LED(23)
     led_red = LED(22)
@@ -63,11 +63,11 @@ if __name__ == "__main__":
     if True:
 
         
-        # relay.set_relay(True)
-        # sleep(.5)
-        # relay.set_relay(False)
+        #relay.set_relay(True)
+        #sleep(.5)
+        #relay.set_relay(False)
 
-        # sleep(10)
+        #sleep(10)
 
         led_green.on()
 
