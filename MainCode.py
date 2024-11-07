@@ -19,13 +19,16 @@ def main():
     Scan.scan("./Temp/v.mp4")
     sleep(2)
 
-    print("Preparing for detection ...")
-    VideoProcess.process_video("./Temp/v.mp4", "./Temp/v_p.mp4")
+    frames = VideoProcess.get_frames("./Temp/v.mp4")
     sleep(2)
-    
-    print("Processing scanning result ...")
-    result = ClusterDetection.detect("./Temp/v_p.mp4")
-    result = 0
+    result = ClusterDetection.detect_frames(frames)
+
+    # print("Preparing for detection ...")
+    # VideoProcess.process_video("./Temp/v.mp4", "./Temp/v_p.mp4")
+    # sleep(2)
+
+    # print("Processing scanning result ...")
+    # result = ClusterDetection.detect("./Temp/v_p.mp4")
     return result
 
 def show(result):

@@ -26,3 +26,22 @@ def process_video(input_path, output_path):
 
     cap.release()
     out.release()
+
+
+def get_frames(input_path, frames):
+    MW_pos = [350, 345]
+    MW_size = [480, 285]
+
+    cap = cv2.VideoCapture(input_path)
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if frame is None:
+            break
+        if ret:
+            MW = frame[MW_pos[0]:MW_pos[0] + MW_size[1], MW_pos[1]:MW_pos[1] + MW_size[0]]
+            MW = cv2.resize(MW, (MW_size[0], MW_size[1]))
+
+            frames.append(MW)
+
+    cap.release()

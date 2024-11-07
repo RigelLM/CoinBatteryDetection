@@ -68,6 +68,80 @@ def visualize_clusters(color, image, clusters):
     cv2.destroyAllWindows()
 
 
+def detect_frames(frames, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120, b_size=200, a_eps=1,
+                  a_samples=2):
+    # Define RGB ranges for red and blue
+    lower_red = np.array([158, 89, 90])
+    upper_red = np.array([235, 123, 139])
+
+    lower_blue = np.array([0, 61, 165])
+    upper_blue = np.array([105, 194, 235])
+
+    metal_frame = []
+    ferrous_frame = []
+
+    frame_count = frames.len()
+
+    for frame in frames:
+        red_clusters = detect_clusters_in_frame(lower_red, upper_red, frame, eps=r_eps, min_samples=r_samples,
+                                                min_cluster_size=r_size)
+
+        for label, info in red_clusters.items():
+            y = info['location'][1]
+            if y <= 240:
+                if frame_count >= 5 & frame_count <= 80:
+                    metal_frame.append(frame_count)
+
+        # if red_clusters:
+        #     print(f"Red Clusters: {red_clusters}, frame: {frame_count}")
+        #     visualize_clusters('red', frame, red_clusters)
+        #
+
+        blue_clusters = detect_clusters_in_frame(lower_blue, upper_blue, frame, eps=b_eps, min_samples=b_samples,
+                                                 min_cluster_size=b_size)
+
+        for label, info in blue_clusters.items():
+            x = info['location'][0]
+            y = info['location'][1]
+            if y >= 240 & x >= 140:
+                if frame_count >= 5 & frame_count <= 80:
+                    ferrous_frame.append(frame_count)
+
+        # if blue_clusters:
+        #     print(f"Blue Clusters: {blue_clusters}, frame: {frame_count}")
+        #     visualize_clusters('blue', frame, blue_clusters)
+
+    metal_frame_array = np.array(metal_frame).reshape(-1, 1)
+    ferrous_frame_array = np.array(ferrous_frame).reshape(-1, 1)
+
+    dbscan = DBSCAN(eps=a_eps, min_samples=a_samples)
+
+    metal_occurrence = ferrous_occurrence = 0
+
+    if len(metal_frame_array) > 0:
+        metal_clusters = set(dbscan.fit_predict(metal_frame_array))
+
+        if -1 in metal_clusters:
+            metal_clusters.remove(-1)
+
+        metal_occurrence = len(metal_clusters)
+
+    if len(ferrous_frame_array) > 0:
+        ferrous_clusters = set(dbscan.fit_predict(ferrous_frame_array))
+
+        if -1 in ferrous_clusters:
+            ferrous_clusters.remove(-1)
+
+        ferrous_occurrence = len(ferrous_clusters)
+
+    if metal_occurrence >= 2:
+        if ferrous_occurrence >= 2:
+            return 'Battery'
+        else:
+            return 'Metal'
+    else:
+        return 'Empty'
+
 def detect(video_path, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120, b_size=200, a_eps=1,
                   a_samples=2):
     # Define RGB ranges for red and blue
