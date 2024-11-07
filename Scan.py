@@ -35,6 +35,14 @@ picamera.configure(video_config)
 picamera.set_controls({"ExposureValue": 0, "FrameRate": 18, "AwbEnable": False})
 encoder = H264Encoder(10000000)
 
+# Functions for Motor Control
+def Motor_on():
+    gpio.output(ENB_PIN, 0)
+    sleep(0.25)
+    
+def Motor_off():
+    gpio.output(ENB_PIN, 1)
+    sleep(0.25)
 
 # Function to get distance
 def get_distance():
@@ -63,15 +71,19 @@ def callibration():
             print(median)
             print("Wrong position")
             if (int(median - start)) > 0:
+                Motor_on()
                 stepper_move(int((median - start)/1.47/math.pi*400), CCW, step_delay=0.0030)
             else:
+                Motor_on()
                 stepper_move(int((start - median)/1.47/math.pi*400), CW, step_delay=0.0030)
         else:
             print("Correct position")
             print(median)
+            Motor_off()
             return True
 
     print("Callibration failed")
+    Motor_off()
     return False
 
 def move(direction, inch):
@@ -118,13 +130,6 @@ def stepper_move(steps, direction, step_delay=0.00075, accel_steps=100):
 
     picamera.stop()
 
-def Motor_on():
-    gpio.output(ENB_PIN, 0)
-    sleep(0.2)
-    
-def Motor_off():
-    gpio.output(ENB_PIN, 1)
-    sleep(0.2)
     
 # Scan process function
 def scan(file_name, speed=15):
