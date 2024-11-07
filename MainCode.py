@@ -60,22 +60,21 @@ if __name__ == "__main__":
     callibration_pass = Scan.callibration()
 
     # Callibration
-    if True:
+    if callibration_pass:
 
         
-        #relay.set_relay(True)
-        #sleep(.5)
-        #relay.set_relay(False)
+        relay.set_relay(True)
+        sleep(.5)
+        relay.set_relay(False)
 
-        #sleep(10)
+        sleep(10)
 
         led_green.on()
 
 
         in_progress = False
-        while True:
+        while callibration_pass:
             if button.is_pressed:
-                
 
                 led_white.off()
                 led_yellow.off()
@@ -96,6 +95,8 @@ if __name__ == "__main__":
                     in_progress = False
 
                     show(result)
+
+                callibration_pass = Scan.callibration()
 
     else:
         while True:
