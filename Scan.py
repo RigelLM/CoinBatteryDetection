@@ -137,6 +137,7 @@ def scan(file_name, speed=15):
 
     output = FfmpegOutput(file_name)
     Motor_on()
+
     picamera.start_recording(encoder, output)
 
     stepper_move(1240, CW, step_delay)
