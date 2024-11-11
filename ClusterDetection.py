@@ -1,12 +1,11 @@
 import cv2
-import numpy as np
 from sklearn.cluster import DBSCAN
-import math
 
+import math
+import numpy as np
 
 def radius_from_area(size):
     return math.sqrt(size / math.pi)
-
 
 # apply dbscan algorithm to a single frame, getting clusters' information
 # return a dictionary with length 0 if no cluster detected
@@ -73,8 +72,7 @@ def visualize_clusters(color, image, clusters):
 
 # Apply cluster algorithm to the whole video, with frames array as input
 # Do not have to read video file in this func
-def detect_frame_array(frames=[], r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120, b_size=200, a_eps=1,
-                       a_samples=2):
+def detect_frame_array(frames=[], r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120, b_size=200, a_eps=1, a_samples=2):
     # Define RGB ranges for red and blue
     lower_red = np.array([158, 75, 75])
     upper_red = np.array([235, 123, 139])
@@ -106,8 +104,7 @@ def detect_frame_array(frames=[], r_eps=5, b_eps=5, r_samples=10, b_samples=10, 
         #    visualize_clusters('red', frame, red_clusters)
 
         # Clustering blue pixels
-        blue_clusters = detect_clusters_in_frame(lower_blue, upper_blue, frame, eps=b_eps, min_samples=b_samples,
-                                                 min_cluster_size=b_size)
+        blue_clusters = detect_clusters_in_frame(lower_blue, upper_blue, frame, eps=b_eps, min_samples=b_samples, min_cluster_size=b_size)
 
         for label, info in blue_clusters.items():
             x = info['location'][0]
@@ -157,8 +154,7 @@ def detect_frame_array(frames=[], r_eps=5, b_eps=5, r_samples=10, b_samples=10, 
 
 # Apply cluster algorithm to the whole video, with file path as input
 # Reading video file in this func
-def detect(video_path, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120, b_size=200, a_eps=1,
-           a_samples=2):
+def detect(video_path, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120, b_size=200, a_eps=1, a_samples=2):
     # Define RGB ranges for red and blue
     lower_red = np.array([158, 89, 90])
     upper_red = np.array([235, 123, 139])
@@ -192,8 +188,7 @@ def detect(video_path, r_eps=5, b_eps=5, r_samples=10, b_samples=10, r_size=120,
             visualize_clusters('red', frame, red_clusters)
         #
 
-        blue_clusters = detect_clusters_in_frame(lower_blue, upper_blue, frame, eps=b_eps, min_samples=b_samples,
-                                                 min_cluster_size=b_size)
+        blue_clusters = detect_clusters_in_frame(lower_blue, upper_blue, frame, eps=b_eps, min_samples=b_samples, min_cluster_size=b_size)
 
         for label, info in blue_clusters.items():
             x = info['location'][0]
