@@ -1,13 +1,13 @@
-from time import sleep
 import RPi.GPIO as gpio
-import math
-from picamera2 import Picamera2
-from picamera2.encoders import H264Encoder
-from picamera2.outputs import FfmpegOutput
-import numpy as np
 import qwiic_vl53l1x
 
-# Initialize the sensor
+import numpy as np
+from time import sleep
+
+import math
+import Camera
+
+# Initialize the dtance sensor
 my_sensor = qwiic_vl53l1x.QwiicVL53L1X()
 my_sensor.sensor_init()
 my_sensor.set_distance_mode(1)
@@ -27,73 +27,72 @@ gpio.setup(ENB_PIN, gpio.OUT)
 gpio.output(DIR_PIN, CW)
 gpio.output(ENB_PIN, 1)
 
-# Camera setup
-picamera = Picamera2()
-video_config = picamera.create_video_configuration()
-picamera.configure(video_config)
-picamera.set_controls({"ExposureValue": 0, "FrameRate": 18, "AwbEnable": False})
-encoder = H264Encoder(10000000)
+# Convert inch to steps
+def inch_2_steps(inch):
+    return int(((inch * SPR)/ DIAMETER) / math.pi)
+
+# Convert mm to inch
+def mm_2_inch(mm):
+    return ((mm / 10) / 2.54)
 
 # Functions for Motor Control
-def Motor_on():
+def motor_on():
     gpio.output(ENB_PIN, 0)
     sleep(0.25)
-    
-def Motor_off():
+
+def motor_off():
     gpio.output(ENB_PIN, 1)
     sleep(0.25)
 
 # Function to get distance
 def get_distance():
     my_sensor.start_ranging()
-    sleep(0.1)
+    sleep(0.05)
     distance = my_sensor.get_distance()  # Get distance in mm
     my_sensor.stop_ranging()
     my_sensor.clear_interrupt()
-    distance = (distance / 10) / 2.54  # Convert to inches
-    return distance
+    return mm_2_inch(distance)
 
-
-def get_median(i):
+# Get median among i distance measurements
+def get_median_dis(i):
     results = []
     for _ in range(i):
         distance = get_distance()
         results.append(distance)
     return np.median(results)
 
+# Callibration at every beginning of the scan
 def callibration():
+    # Starting position
     start = 13.5
+    range = 0.2
+
+    # Check position for 5 times
     for i in range(5):
         print("Getting distance...")
-        median = get_median(10)
-        if median >= (start+0.2) or median <= (start-0.2):
+        median = get_median_dis(10)
+        if median >= (start + range) or median <= (start - range):
             print(median)
             print("Wrong position")
-            if (int(median - start)) > 0:
-                Motor_on()
-                stepper_move(int((median - start)/1.47/math.pi*400), CCW, step_delay=0.0030)
-            else:
-                Motor_on()
-                stepper_move(int((start - median)/1.47/math.pi*400), CW, step_delay=0.0030)
+
+            d = (median - start) if (median > start) else (start - median)
+
+            motor_on()
+            stepper_move(inch_2_steps(d), CCW, step_delay=0.003)
+            motor_off()
+
         else:
-            print("Correct position")
             print(median)
-            Motor_off()
+            print("Correct position")
             return True
 
     print("Callibration failed")
-    Motor_off()
     return False
 
-def move(direction, inch):
-    steps = (inch * 85)
-    if steps <= 200:
-        stepper_move(steps, direction, accel_steps = 0)
-    else:
-        stepper_move(steps, directon)
-
 # Function to move stepper motor
-def stepper_move(steps, direction, step_delay=0.00075, accel_steps=100):
+def stepper_move(steps, direction, step_delay=0.00075, accel_steps=50):
+
+    # Enable acceleration only when steps > 200
     if steps < 200:
         accel_steps = 0
 
@@ -103,8 +102,6 @@ def stepper_move(steps, direction, step_delay=0.00075, accel_steps=100):
     time_delays_reversed = time_delays[::-1]
 
     gpio.output(DIR_PIN, direction)
-
-    picamera.start()
 
     # Accelerate
     for delay in time_delays:
@@ -127,23 +124,19 @@ def stepper_move(steps, direction, step_delay=0.00075, accel_steps=100):
         gpio.output(PUL_PIN, gpio.LOW)
         sleep(delay)
 
-    picamera.stop()
-
-    
 # Scan process function
-def scan(file_name, speed=15):
+def scan(filename, speed=15):
     step_delay = (DIAMETER * math.pi) / (400 * speed)
     step_delay = round(step_delay, 5)
 
-    output = FfmpegOutput(file_name)
-    Motor_on()
+    Camera.start_video(filename)
+    motor_on()
 
-    picamera.start_recording(encoder, output)
+    stepper_move(1240, CW, step_delay, 100)
 
-    stepper_move(1240, CW, step_delay)
+    stepper_move(1240, CCW, step_delay, 100)
 
-    stepper_move(1240, CCW, step_delay)
+    motor_off()
+    Camera.stop_video()
 
-    picamera.stop_recording()
-    Motor_off()
     sleep(1.8)
