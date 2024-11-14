@@ -65,20 +65,21 @@ def get_median_dis(i):
 def callibration():
     # Starting position
     start = 13.5
-    range = 0.2
+    tolerance = 0.2
 
     # Check position for 5 times
     for i in range(5):
         print("Getting distance...")
         median = get_median_dis(10)
-        if median >= (start + range) or median <= (start - range):
+        if median >= (start + tolerance) or median <= (start - tolerance):
             print(median)
             print("Wrong position")
 
             d = (median - start) if (median > start) else (start - median)
-
+            direction = CCW if (median > start) else CW
+            
             motor_on()
-            stepper_move(inch_2_steps(d), CCW, step_delay=0.003)
+            stepper_move(inch_2_steps(d), direction, step_delay=0.003)
             motor_off()
 
         else:
