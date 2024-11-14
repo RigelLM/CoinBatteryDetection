@@ -26,7 +26,11 @@ def get_image_2_array():
     picamera.configure(image_config)
     picamera.start(show_preview=False)
 
-    return picamera.capture_array("Display")
+    image =  picamera.capture_array("main")
+
+    picamera.stop()
+
+    return image
 
 # Image as file
 def get_image_2_file(filepath):
@@ -34,3 +38,5 @@ def get_image_2_file(filepath):
     picamera.start(show_preview=False)
 
     picamera.capture_file(filepath)
+
+    picamera.stop()
