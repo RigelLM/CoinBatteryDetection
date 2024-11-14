@@ -54,7 +54,6 @@ def main():
     sleep(2)
 
     print("Processing scanning result ...")
-    return ClusterDetection.detect("./Temp/v_p.mp4")
     result =  ClusterDetection.detect(pro_filename)
 
     write_reference(ori_filename, result)
