@@ -33,7 +33,7 @@ def set_sensor(on):
             print("Sensor off")
     else:
         if on:
-            press_sensor_btn(0,5)
+            press_sensor_btn(0.5)
             print("Sensor on")
             # Wait til display is ready
             sleep(10)
