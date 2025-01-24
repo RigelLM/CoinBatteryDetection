@@ -54,7 +54,7 @@ def main():
     sleep(2)
 
     print("Processing scanning result ...")
-    result =  ClusterDetection.detect(pro_filename)
+    result = ClusterDetection.detect(pro_filename)
 
     write_reference(ori_filename, result)
 

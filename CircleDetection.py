@@ -10,9 +10,11 @@ percent_threshold_half = 0.6237513873473918
 
 percent_threshold_third = 0.41583425823159453
 
+
 def circle_from_frame(frame, minR, maxR):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, dp=1, minDist=maxR * 1.5, param1=50, param2=30, minRadius=minR, maxRadius=maxR)
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, dp=1, minDist=maxR * 1.5, param1=50, param2=30, minRadius=minR,
+                               maxRadius=maxR)
 
     if circles is not None:
         target = circles[0][0]
@@ -26,9 +28,11 @@ def circle_from_frame(frame, minR, maxR):
     else:
         return None
 
+
 def visualize_circle(frame, minR, maxR):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, dp=1, minDist=maxR * 1.5, param1=50, param2=30, minRadius=minR, maxRadius=maxR)
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, dp=1, minDist=maxR * 1.5, param1=50, param2=30, minRadius=minR,
+                               maxRadius=maxR)
 
     if circles is not None:
         target = circles[0][0]
@@ -42,22 +46,23 @@ def visualize_circle(frame, minR, maxR):
     else:
         return None
 
+
 def detect_twice(array):
     occurrence = 0
     frame_array = np.array(array).reshape(-1, 1)
 
     dbscan = DBSCAN(eps=1, min_samples=2)
 
-
     if len(frame_array) > 0:
         clusters = set(dbscan.fit_predict(frame_array))
-
+        print(clusters)
         if -1 in clusters:
             clusters.remove(-1)
 
         occurrence = len(clusters)
 
     return occurrence
+
 
 def detect_metal(video_path):
     target_frames = []
@@ -77,7 +82,7 @@ def detect_metal(video_path):
         p = visualize_circle(frame, 10, 25)
 
         if pixels is not None:
-            green_values = 255 - pixels[:, 1] # (B=0, G=1, R=2)
+            green_values = 255 - pixels[:, 1]  # (B=0, G=1, R=2)
 
             target_pixels = green_values[green_values > green_threshold]
 
